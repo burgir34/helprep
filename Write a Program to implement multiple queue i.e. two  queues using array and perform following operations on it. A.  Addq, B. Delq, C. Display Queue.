@@ -1,0 +1,138 @@
+Write a Program to implement multiple queue i.e. two 
+queues using array and perform following operations on it. A. 
+Addq, B. Delq, C. Display Queue.  
+Given a list, split it into two sublists — one for the front half, and 
+one for the back half. If the number of elements is odd, the extra 
+element should go in the front list. So FrontBackSplit() on the list 
+{2, 3, 5, 7, 11} should yield the two lists {2, 3, 5} and {7, 11}. 
+Getting this right for all the cases is harder than it looks. You 
+should check your solution against a few cases (length = 2, 
+length = 3, length=4) to make sure that the list gets split correctly 
+near the short-list boundary conditions. If it works right for 
+length=4, it probably works right for length=1000. You will 
+probably need special case code to deal with the (length <2) 
+cases.
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 10
+
+// Structure to represent a queue
+typedef struct {
+    int items[MAX_SIZE];
+    int front, rear;
+} Queue;
+
+// Function to initialize a queue
+void initializeQueue(Queue *q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+// Function to check if the queue is full
+int isFull(Queue *q) {
+    return q->rear == MAX_SIZE - 1;
+}
+
+// Function to check if the queue is empty
+int isEmpty(Queue *q) {
+    return q->front == -1;
+}
+
+// Function to add an element to the queue
+void Addq(Queue *q, int value) {
+    if (isFull(q)) {
+        printf("Queue is full, cannot add %d\n", value);
+        return;
+    }
+    if (isEmpty(q)) {
+        q->front = 0;
+    }
+    q->rear++;
+    q->items[q->rear] = value;
+}
+
+// Function to remove an element from the queue
+int Delq(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty, cannot delete\n");
+        return -1;
+    }
+    int item = q->items[q->front];
+    if (q->front == q->rear) {
+        q->front = q->rear = -1;
+    } else {
+        q->front++;
+    }
+    return item;
+}
+
+// Function to display the contents of the queue
+void DisplayQueue(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty\n");
+        return;
+    }
+    printf("Queue contents: ");
+    for (int i = q->front; i <= q->rear; i++) {
+        printf("%d ", q->items[i]);
+    }
+    printf("\n");
+}
+
+// Function to split a list into two sublists (front and back)
+void FrontBackSplit(int arr[], int size, Queue *frontQueue, Queue *backQueue) {
+    int mid = (size + 1) / 2;  // Ensure the extra element goes to the front list
+
+    // Add elements to the frontQueue (first half, including the extra element if odd)
+    for (int i = 0; i < mid; i++) {
+        Addq(frontQueue, arr[i]);
+    }
+
+    // Add elements to the backQueue (remaining half)
+    for (int i = mid; i < size; i++) {
+        Addq(backQueue, arr[i]);
+    }
+}
+
+// Main function
+int main() {
+    Queue queue1, queue2;
+    initializeQueue(&queue1);
+    initializeQueue(&queue2);
+
+    // Demonstrating multiple queues
+    printf("Adding elements to queue1\n");
+    Addq(&queue1, 1);
+    Addq(&queue1, 2);
+    Addq(&queue1, 3);
+    DisplayQueue(&queue1);
+
+    printf("Adding elements to queue2\n");
+    Addq(&queue2, 10);
+    Addq(&queue2, 20);
+    Addq(&queue2, 30);
+    DisplayQueue(&queue2);
+
+    printf("Removing elements from queue1\n");
+    printf("Deleted: %d\n", Delq(&queue1));
+    DisplayQueue(&queue1);
+
+    // Splitting a list into two sublists
+    int list[] = {2, 3, 5, 7, 11}; // Example list
+    int size = sizeof(list) / sizeof(list[0]);
+    
+    Queue frontQueue, backQueue;
+    initializeQueue(&frontQueue);
+    initializeQueue(&backQueue);
+
+    FrontBackSplit(list, size, &frontQueue, &backQueue);
+
+    printf("\nFront Queue: ");
+    DisplayQueue(&frontQueue);
+
+    printf("Back Queue: ");
+    DisplayQueue(&backQueue);
+
+    return 0;
+}
