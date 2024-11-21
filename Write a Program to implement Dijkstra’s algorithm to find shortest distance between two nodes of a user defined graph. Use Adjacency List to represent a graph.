@@ -1,0 +1,113 @@
+//Write a Program to implement Dijkstra’s algorithm to find
+shortest distance between two nodes of a user defined graph.
+Use Adjacency List to represent a graph.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define V 5  // Number of vertices in the graph
+#define INF 1000000  // Defining a large value to represent infinity
+
+// Define a structure for the adjacency list node
+typedef struct Node {
+    int vertex;
+    int weight;
+    struct Node* next;
+} Node;
+
+// Define a structure for the adjacency list
+typedef struct {
+    Node* head;
+} AdjList;
+
+// A function to create a new adjacency list node
+Node* newNode(int vertex, int weight) {
+    Node* node = (Node*)malloc(sizeof(Node));
+    node->vertex = vertex;
+    node->weight = weight;
+    node->next = NULL;
+    return node;
+}
+
+// A function to add an edge to the graph (undirected graph)
+void addEdge(AdjList* graph, int src, int dest, int weight) {
+    Node* node = newNode(dest, weight);
+    node->next = graph[src].head;
+    graph[src].head = node;
+    
+    node = newNode(src, weight);
+    node->next = graph[dest].head;
+    graph[dest].head = node;
+}
+
+// A function to find the vertex with the minimum distance
+int minDistance(int dist[], int sptSet[]) {
+    int min = INF, min_index;
+    for (int v = 0; v < V; v++) {
+        if (sptSet[v] == 0 && dist[v] <= min) {
+            min = dist[v];
+            min_index = v;
+        }
+    }
+    return min_index;
+}
+
+// Function to implement Dijkstra's algorithm
+void dijkstra(AdjList* graph, int start, int end) {
+    int dist[V];       // The output array dist[i] holds the shortest distance from start to i
+    int sptSet[V];     // sptSet[i] will be true if vertex i is included in the shortest path tree
+
+    // Initialize all distances as infinity and sptSet[] as false
+    for (int i = 0; i < V; i++) {
+        dist[i] = INF;
+        sptSet[i] = 0;
+    }
+    dist[start] = 0;
+
+    // Calculate shortest path for all vertices
+    for (int count = 0; count < V - 1; count++) {
+        int u = minDistance(dist, sptSet);
+        sptSet[u] = 1;
+
+        // Update dist value of the adjacent vertices of the picked vertex
+        Node* temp = graph[u].head;
+        while (temp != NULL) {
+            int v = temp->vertex;
+            if (!sptSet[v] && dist[u] != INF && dist[u] + temp->weight < dist[v]) {
+                dist[v] = dist[u] + temp->weight;
+            }
+            temp = temp->next;
+        }
+    }
+
+    // Print the shortest path from start to end
+    printf("Shortest distance from %d to %d is: %d\n", start, end, dist[end]);
+}
+
+int main() {
+    AdjList graph[V];
+
+    // Initialize the adjacency list for each vertex
+    for (int i = 0; i < V; i++) {
+        graph[i].head = NULL;
+    }
+
+    // Add edges to the graph
+    addEdge(graph, 0, 1, 10);
+    addEdge(graph, 0, 2, 3);
+    addEdge(graph, 1, 2, 1);
+    addEdge(graph, 1, 3, 2);
+    addEdge(graph, 2, 3, 8);
+    addEdge(graph, 3, 4, 7);
+    addEdge(graph, 2, 4, 2);
+
+    // Define the start and end nodes
+    int start, end;
+    printf("Enter the start node and end node: ");
+    scanf("%d %d", &start, &end);
+
+    // Call Dijkstra's algorithm to find the shortest distance
+    dijkstra(graph, start, end);
+
+    return 0;
+}
