@@ -1,0 +1,176 @@
+  Write a Program to create a Binary Search Tree and 
+perform deletion of a node from it. Also display the tree in 
+nonrecursive postorder way.
+#include <stdio.h>
+#include <stdlib.h>
+#include <stack>
+
+// Definition of a Binary Tree Node
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node in the BST
+struct Node* insert(struct Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else if (data > root->data) {
+        root->right = insert(root->right, data);
+    }
+
+    return root;
+}
+
+// Function to find the minimum node in a tree
+struct Node* findMin(struct Node* root) {
+    while (root && root->left != NULL) {
+        root = root->left;
+    }
+    return root;
+}
+
+// Function to delete a node from the BST
+struct Node* deleteNode(struct Node* root, int data) {
+    if (root == NULL) {
+        return root;
+    }
+
+    // Find the node to be deleted
+    if (data < root->data) {
+        root->left = deleteNode(root->left, data);
+    } else if (data > root->data) {
+        root->right = deleteNode(root->right, data);
+    } else {
+        // Node with only one child or no child
+        if (root->left == NULL) {
+            struct Node* temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        // Node with two children: get the inorder successor
+        struct Node* temp = findMin(root->right);
+
+        // Copy the inorder successor's content to this node
+        root->data = temp->data;
+
+        // Delete the inorder successor
+        root->right = deleteNode(root->right, temp->data);
+    }
+    return root;
+}
+
+// Non-recursive Postorder Traversal
+void postorderNonRecursive(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    std::stack<struct Node*> stack1, stack2;
+    stack1.push(root);
+
+    while (!stack1.empty()) {
+        struct Node* node = stack1.top();
+        stack1.pop();
+        stack2.push(node);
+
+        if (node->left != NULL) {
+            stack1.push(node->left);
+        }
+        if (node->right != NULL) {
+            stack1.push(node->right);
+        }
+    }
+
+    // Print nodes in postorder
+    while (!stack2.empty()) {
+        struct Node* node = stack2.top();
+        stack2.pop();
+        printf("%d ", node->data);
+    }
+}
+
+// Inorder Traversal to display the tree (For visualization purposes)
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+
+// Main function
+int main() {
+    struct Node* root = NULL;
+    int choice, data;
+
+    // Create a Binary Search Tree
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 70);
+    root = insert(root, 60);
+    root = insert(root, 80);
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Insert Node\n");
+        printf("2. Delete Node\n");
+        printf("3. Display Tree (Inorder Traversal)\n");
+        printf("4. Postorder Traversal (Non-recursive)\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data to insert: ");
+                scanf("%d", &data);
+                root = insert(root, data);
+                printf("Node inserted.\n");
+                break;
+            case 2:
+                printf("Enter data to delete: ");
+                scanf("%d", &data);
+                root = deleteNode(root, data);
+                printf("Node deleted.\n");
+                break;
+            case 3:
+                printf("Inorder Traversal of the Tree: ");
+                inorder(root);
+                printf("\n");
+                break;
+            case 4:
+                printf("Postorder Traversal (Non-recursive): ");
+                postorderNonRecursive(root);
+                printf("\n");
+                break;
+            case 5:
+                printf("Exiting program...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
