@@ -1,0 +1,213 @@
+  Write a Program to create a Binary Search Tree and 
+perform following nonrecursive operations on it. a. Preorder 
+Traversal b. Postorder Traversal c. Display total Number of 
+Nodes d. Display Leaf nodes.
+#include <stdio.h>
+#include <stdlib.h>
+#include <stack>
+
+// Definition of a Binary Tree Node
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a new node in the BST
+struct Node* insert(struct Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else if (data > root->data) {
+        root->right = insert(root->right, data);
+    }
+
+    return root;
+}
+
+// Non-recursive Preorder Traversal
+void preorderNonRecursive(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    // Use a stack to simulate the preorder traversal
+    std::stack<struct Node*> stack;
+    stack.push(root);
+
+    while (!stack.empty()) {
+        struct Node* node = stack.top();
+        stack.pop();
+        printf("%d ", node->data);
+
+        if (node->right != NULL) {
+            stack.push(node->right);
+        }
+        if (node->left != NULL) {
+            stack.push(node->left);
+        }
+    }
+}
+
+// Non-recursive Postorder Traversal
+void postorderNonRecursive(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    std::stack<struct Node*> stack1, stack2;
+    stack1.push(root);
+
+    while (!stack1.empty()) {
+        struct Node* node = stack1.top();
+        stack1.pop();
+        stack2.push(node);
+
+        if (node->left != NULL) {
+            stack1.push(node->left);
+        }
+        if (node->right != NULL) {
+            stack1.push(node->right);
+        }
+    }
+
+    // Print nodes in postorder
+    while (!stack2.empty()) {
+        struct Node* node = stack2.top();
+        stack2.pop();
+        printf("%d ", node->data);
+    }
+}
+
+// Function to count the number of nodes in the tree
+int countNodes(struct Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+
+    int count = 0;
+    std::stack<struct Node*> stack;
+    stack.push(root);
+
+    while (!stack.empty()) {
+        struct Node* node = stack.top();
+        stack.pop();
+        count++;
+
+        if (node->left != NULL) {
+            stack.push(node->left);
+        }
+        if (node->right != NULL) {
+            stack.push(node->right);
+        }
+    }
+
+    return count;
+}
+
+// Function to display the leaf nodes of the tree
+void displayLeafNodes(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    std::stack<struct Node*> stack;
+    stack.push(root);
+
+    while (!stack.empty()) {
+        struct Node* node = stack.top();
+        stack.pop();
+
+        // Check if the node is a leaf node
+        if (node->left == NULL && node->right == NULL) {
+            printf("%d ", node->data);
+        }
+
+        if (node->right != NULL) {
+            stack.push(node->right);
+        }
+        if (node->left != NULL) {
+            stack.push(node->left);
+        }
+    }
+}
+
+// Function to display the tree (Inorder Traversal)
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+
+// Main function
+int main() {
+    struct Node* root = NULL;
+    int choice, data;
+
+    // Create a Binary Search Tree
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 70);
+    root = insert(root, 60);
+    root = insert(root, 80);
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Preorder Traversal (Non-recursive)\n");
+        printf("2. Postorder Traversal (Non-recursive)\n");
+        printf("3. Count Total Number of Nodes\n");
+        printf("4. Display Leaf Nodes\n");
+        printf("5. Display Tree (Inorder Traversal)\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Preorder Traversal (Non-recursive): ");
+                preorderNonRecursive(root);
+                printf("\n");
+                break;
+            case 2:
+                printf("Postorder Traversal (Non-recursive): ");
+                postorderNonRecursive(root);
+                printf("\n");
+                break;
+            case 3:
+                printf("Total Number of Nodes: %d\n", countNodes(root));
+                break;
+            case 4:
+                printf("Leaf Nodes: ");
+                displayLeafNodes(root);
+                printf("\n");
+                break;
+            case 5:
+                printf("Inorder Traversal of the Tree: ");
+                inorder(root);
+                printf("\n");
+                break;
+            case 6:
+                printf("Exiting program...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
