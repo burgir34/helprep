@@ -1,0 +1,116 @@
+//  WAP to implement following by using stack. A. Factorial of 
+a given number B. Generation of Fibonacci series
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+// Function to push an element onto the stack
+void push(int value) {
+    if (top >= MAX - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    stack[++top] = value;
+}
+
+// Function to pop an element from the stack
+int pop() {
+    if (top < 0) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return stack[top--];
+}
+
+// **A. Factorial Using Stack**
+int factorialUsingStack(int num) {
+    int result = 1;
+
+    // Push all numbers from 1 to num onto the stack
+    for (int i = 1; i <= num; i++) {
+        push(i);
+    }
+
+    // Multiply numbers while popping them from the stack
+    while (top >= 0) {
+        result *= pop();
+    }
+
+    return result;
+}
+
+// **B. Fibonacci Series Using Stack**
+void fibonacciUsingStack(int n) {
+    int first = 0, second = 1, next;
+
+    // Push the first two Fibonacci numbers
+    push(first);
+    push(second);
+
+    printf("Fibonacci Series: %d %d ", first, second);
+
+    for (int i = 3; i <= n; i++) {
+        // Generate the next Fibonacci number
+        second = pop();    // Second last Fibonacci number
+        first = pop();     // Third last Fibonacci number
+        next = first + second;
+
+        // Push updated values back onto the stack
+        push(second);
+        push(next);
+
+        printf("%d ", next);
+    }
+    printf("\n");
+}
+
+// **Main Function**
+int main() {
+    int choice, num;
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Factorial of a Number\n");
+        printf("2. Fibonacci Series\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter a number to find its factorial: ");
+                scanf("%d", &num);
+
+                if (num < 0) {
+                    printf("Factorial is not defined for negative numbers.\n");
+                } else {
+                    printf("Factorial of %d is: %d\n", num, factorialUsingStack(num));
+                }
+                break;
+
+            case 2:
+                printf("Enter the number of terms for the Fibonacci series: ");
+                scanf("%d", &num);
+
+                if (num <= 0) {
+                    printf("Please enter a positive integer.\n");
+                } else {
+                    fibonacciUsingStack(num);
+                }
+                break;
+
+            case 3:
+                printf("Exiting...\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice. Try again.\n");
+        }
+    }
+
+    return 0;
+}
