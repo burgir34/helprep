@@ -1,0 +1,171 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100 // Maximum size of the array
+
+typedef struct {
+    int top;
+    int start;
+    int end;
+} Stack;
+
+int arr[MAX];   // Shared array for all stacks
+Stack stacks[10]; // Maximum of 10 stacks can be managed
+int totalStacks; // Number of stacks in the array
+
+// Initialize all stacks
+void initializeStacks(int numStacks, int stackSize) {
+    totalStacks = numStacks;
+
+    for (int i = 0; i < numStacks; i++) {
+        stacks[i].start = i * stackSize;
+        stacks[i].end = (i + 1) * stackSize - 1;
+        stacks[i].top = stacks[i].start - 1;
+    }
+}
+
+// Check if a specific stack is full
+int isStackFull(int stackNum) {
+    return stacks[stackNum].top == stacks[stackNum].end;
+}
+
+// Check if a specific stack is empty
+int isStackEmpty(int stackNum) {
+    return stacks[stackNum].top < stacks[stackNum].start;
+}
+
+// Push an element into a specific stack
+void push(int stackNum, int value) {
+    if (isStackFull(stackNum)) {
+        printf("Stack %d is Full\n", stackNum);
+        return;
+    }
+    stacks[stackNum].top++;
+    arr[stacks[stackNum].top] = value;
+    printf("Pushed %d into Stack %d\n", value, stackNum);
+}
+
+// Pop an element from a specific stack
+int pop(int stackNum) {
+    if (isStackEmpty(stackNum)) {
+        printf("Stack %d is Empty\n", stackNum);
+        return -1;
+    }
+    int value = arr[stacks[stackNum].top];
+    stacks[stackNum].top--;
+    printf("Popped %d from Stack %d\n", value, stackNum);
+    return value;
+}
+
+// Display elements of a specific stack
+void displayStack(int stackNum) {
+    if (isStackEmpty(stackNum)) {
+        printf("Stack %d is Empty\n", stackNum);
+        return;
+    }
+    printf("Stack %d: ", stackNum);
+    for (int i = stacks[stackNum].start; i <= stacks[stackNum].top; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int numStacks, stackSize;
+    printf("Enter the number of stacks: ");
+    scanf("%d", &numStacks);
+
+    printf("Enter the size of each stack: ");
+    scanf("%d", &stackSize);
+
+    if (numStacks * stackSize > MAX) {
+        printf("Insufficient space in array for the given configuration.\n");
+        return 1;
+    }
+
+    initializeStacks(numStacks, stackSize);
+
+    int choice, stackNum, value;
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Push\n");
+        printf("2. Pop\n");
+        printf("3. Check Stack Full\n");
+        printf("4. Check Stack Empty\n");
+        printf("5. Display Stack\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter Stack Number (0 to %d): ", totalStacks - 1);
+                scanf("%d", &stackNum);
+                if (stackNum < 0 || stackNum >= totalStacks) {
+                    printf("Invalid Stack Number\n");
+                    break;
+                }
+                printf("Enter Value to Push: ");
+                scanf("%d", &value);
+                push(stackNum, value);
+                break;
+
+            case 2:
+                printf("Enter Stack Number (0 to %d): ", totalStacks - 1);
+                scanf("%d", &stackNum);
+                if (stackNum < 0 || stackNum >= totalStacks) {
+                    printf("Invalid Stack Number\n");
+                    break;
+                }
+                pop(stackNum);
+                break;
+
+            case 3:
+                printf("Enter Stack Number (0 to %d): ", totalStacks - 1);
+                scanf("%d", &stackNum);
+                if (stackNum < 0 || stackNum >= totalStacks) {
+                    printf("Invalid Stack Number\n");
+                    break;
+                }
+                if (isStackFull(stackNum)) {
+                    printf("Stack %d is Full\n", stackNum);
+                } else {
+                    printf("Stack %d is Not Full\n", stackNum);
+                }
+                break;
+
+            case 4:
+                printf("Enter Stack Number (0 to %d): ", totalStacks - 1);
+                scanf("%d", &stackNum);
+                if (stackNum < 0 || stackNum >= totalStacks) {
+                    printf("Invalid Stack Number\n");
+                    break;
+                }
+                if (isStackEmpty(stackNum)) {
+                    printf("Stack %d is Empty\n", stackNum);
+                } else {
+                    printf("Stack %d is Not Empty\n", stackNum);
+                }
+                break;
+
+            case 5:
+                printf("Enter Stack Number (0 to %d): ", totalStacks - 1);
+                scanf("%d", &stackNum);
+                if (stackNum < 0 || stackNum >= totalStacks) {
+                    printf("Invalid Stack Number\n");
+                    break;
+                }
+                displayStack(stackNum);
+                break;
+
+            case 6:
+                printf("Exiting...\n");
+                exit(0);
+
+            default:
+                printf("Invalid Choice\n");
+        }
+    }
+
+    return 0;
+}
