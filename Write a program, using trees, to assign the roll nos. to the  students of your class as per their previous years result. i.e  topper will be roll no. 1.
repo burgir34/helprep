@@ -1,0 +1,81 @@
+  Write a program, using trees, to assign the roll nos. to the 
+students of your class as per their previous years result. i.e 
+topper will be roll no. 1.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Definition of the student node
+struct Node {
+    int roll_no;
+    char name[50];
+    int score; // Previous year's result score (higher score = better rank)
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int roll_no, char* name, int score) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->roll_no = roll_no;
+    strcpy(newNode->name, name);
+    newNode->score = score;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a student into the BST based on their score
+struct Node* insert(struct Node* root, int roll_no, char* name, int score) {
+    if (root == NULL) {
+        return createNode(roll_no, name, score);
+    }
+
+    if (score > root->score) {
+        root->left = insert(root->left, roll_no, name, score);
+    } else {
+        root->right = insert(root->right, roll_no, name, score);
+    }
+
+    return root;
+}
+
+// Function to perform in-order traversal and assign roll numbers
+void inOrder(struct Node* root, int* rollCounter) {
+    if (root == NULL) {
+        return;
+    }
+
+    // Traverse the left subtree
+    inOrder(root->left, rollCounter);
+
+    // Assign roll number during the in-order traversal
+    root->roll_no = (*rollCounter)++;
+    printf("Roll No. %d: %s with Score: %d\n", root->roll_no, root->name, root->score);
+
+    // Traverse the right subtree
+    inOrder(root->right, rollCounter);
+}
+
+// Function to display all students in sorted order based on their scores
+void displayStudentsInSortedOrder(struct Node* root) {
+    int rollCounter = 1;
+    printf("Assigning Roll Numbers to Students:\n");
+    inOrder(root, &rollCounter);
+}
+
+// Main function
+int main() {
+    struct Node* root = NULL;
+
+    // Students with their scores from previous year (score, name)
+    root = insert(root, 0, "Alice", 85); // Roll number is initially set to 0, we will assign later
+    root = insert(root, 0, "Bob", 92);
+    root = insert(root, 0, "Charlie", 78);
+    root = insert(root, 0, "David", 88);
+    root = insert(root, 0, "Eve", 95);
+
+    // Display students with their roll numbers assigned
+    displayStudentsInSortedOrder(root);
+
+    return 0;
+}
