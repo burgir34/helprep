@@ -1,0 +1,89 @@
+//A person is living in house having 5 rooms. These rooms 
+are adjacent to each other. There is a treasure which is 
+electronically locked and to unlock it we need a code. In last 
+room there is a box in which some decimal number is written. We 
+need to convert that number into binary to open treasure which 
+is kept in room no.1 . We need to move from room no.1 to 2 to 3 
+and so on and follow the reverse way to come back i.e. from 5 to 
+4 to 3 etc. Apply suitable logic to implement this scenario by 
+using stacks.
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Number of rooms
+
+int stack[MAX];
+int top = -1;
+
+// Function to push an element onto the stack
+void push(int value) {
+    if (top >= MAX - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    stack[++top] = value;
+}
+
+// Function to pop an element from the stack
+int pop() {
+    if (top < 0) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return stack[top--];
+}
+
+// Function to check if the stack is empty
+int isEmpty() {
+    return top == -1;
+}
+
+// Function to convert a decimal number to binary
+void decimalToBinary(int num) {
+    int binaryStack[MAX * 4]; // Stack to store binary digits
+    int binaryTop = -1;
+
+    // Convert decimal to binary and store in the binaryStack
+    while (num > 0) {
+        binaryStack[++binaryTop] = num % 2;
+        num /= 2;
+    }
+
+    // Print the binary number
+    printf("Binary equivalent: ");
+    while (binaryTop >= 0) {
+        printf("%d", binaryStack[binaryTop--]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int rooms[MAX] = {1, 2, 3, 4, 5}; // Room numbers
+    int treasureCode; // Code to unlock the treasure
+
+    printf("You are in Room 1. Moving forward through rooms...\n");
+
+    // Moving forward through rooms
+    for (int i = 0; i < MAX; i++) {
+        printf("Entering Room %d\n", rooms[i]);
+        push(rooms[i]);
+    }
+
+    printf("You are in the last room (Room 5).\n");
+    printf("Enter the decimal number written in the box: ");
+    scanf("%d", &treasureCode);
+
+    // Convert decimal number to binary
+    decimalToBinary(treasureCode);
+
+    printf("Returning to Room 1...\n");
+
+    // Moving backward through rooms
+    while (!isEmpty()) {
+        printf("Leaving Room %d\n", pop());
+    }
+
+    printf("You are back in Room 1. Treasure unlocked!\n");
+
+    return 0;
+}
