@@ -1,0 +1,146 @@
+//WAP to implement Merge Sort and Quick sort on 1D array of
+Faculty structure (contains faculty_name, faculty_ID,
+subject_codes, class_names), with key as faculty_ID. And count the
+number of swap performed
+
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_SUBJECTS 5
+#define MAX_CLASSES 5
+
+typedef struct {
+    char faculty_name[50];
+    int faculty_ID;
+    char subject_codes[MAX_SUBJECTS][10];
+    char class_names[MAX_CLASSES][10];
+} Faculty;
+
+// Function to print the array of Faculty structures
+void printFacultyArray(Faculty faculty[], int n) {
+    printf("Faculty Details:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Name: %s, ID: %d\n", faculty[i].faculty_name, faculty[i].faculty_ID);
+    }
+}
+
+// Merge Sort Functions
+void merge(Faculty arr[], int left, int mid, int right, int *comparisons) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    Faculty L[n1], R[n2];
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (int i = 0; i < n2; i++)
+        R[i] = arr[mid + 1 + i];
+
+    int i = 0, j = 0, k = left;
+
+    while (i < n1 && j < n2) {
+        (*comparisons)++;
+        if (L[i].faculty_ID <= R[j].faculty_ID) {
+            arr[k++] = L[i++];
+        } else {
+            arr[k++] = R[j++];
+        }
+    }
+
+    while (i < n1) {
+        arr[k++] = L[i++];
+    }
+
+    while (j < n2) {
+        arr[k++] = R[j++];
+    }
+}
+
+void mergeSort(Faculty arr[], int left, int right, int *comparisons) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+
+        mergeSort(arr, left, mid, comparisons);
+        mergeSort(arr, mid + 1, right, comparisons);
+
+        merge(arr, left, mid, right, comparisons);
+    }
+}
+
+// Quick Sort Functions
+void swap(Faculty *a, Faculty *b, int *swaps) {
+    Faculty temp = *a;
+    *a = *b;
+    *b = temp;
+    (*swaps)++;
+}
+
+int partition(Faculty arr[], int low, int high, int *swaps) {
+    int pivot = arr[high].faculty_ID;
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (arr[j].faculty_ID < pivot) {
+            i++;
+            swap(&arr[i], &arr[j], swaps);
+        }
+    }
+
+    swap(&arr[i + 1], &arr[high], swaps);
+    return i + 1;
+}
+
+void quickSort(Faculty arr[], int low, int high, int *swaps) {
+    if (low < high) {
+        int pi = partition(arr, low, high, swaps);
+
+        quickSort(arr, low, pi - 1, swaps);
+        quickSort(arr, pi + 1, high, swaps);
+    }
+}
+
+// Main Function
+int main() {
+    int n;
+
+    printf("Enter the number of faculty members: ");
+    scanf("%d", &n);
+
+    Faculty faculty[n];
+
+    // Input Faculty Details
+    for (int i = 0; i < n; i++) {
+        printf("Enter details for faculty %d:\n", i + 1);
+        printf("Name: ");
+        scanf("%s", faculty[i].faculty_name);
+        printf("Faculty ID: ");
+        scanf("%d", &faculty[i].faculty_ID);
+        // Dummy input for subject codes and class names
+        for (int j = 0; j < MAX_SUBJECTS; j++) {
+            sprintf(faculty[i].subject_codes[j], "Sub%d", j + 1);
+        }
+        for (int k = 0; k < MAX_CLASSES; k++) {
+            sprintf(faculty[i].class_names[k], "Class%d", k + 1);
+        }
+    }
+
+    // Merge Sort
+    Faculty mergeSortedFaculty[n];
+    memcpy(mergeSortedFaculty, faculty, sizeof(faculty));
+    int comparisons = 0;
+    mergeSort(mergeSortedFaculty, 0, n - 1, &comparisons);
+    printf("\nFaculty sorted by Merge Sort (by faculty_ID):\n");
+    printFacultyArray(mergeSortedFaculty, n);
+    printf("Number of comparisons in Merge Sort: %d\n", comparisons);
+
+    // Quick Sort
+    Faculty quickSortedFaculty[n];
+    memcpy(quickSortedFaculty, faculty, sizeof(faculty));
+    int swaps = 0;
+    quickSort(quickSortedFaculty, 0, n - 1, &swaps);
+    printf("\nFaculty sorted by Quick Sort (by faculty_ID):\n");
+    printFacultyArray(quickSortedFaculty, n);
+    printf("Number of swaps in Quick Sort: %d\n", swaps);
+
+    return 0;
+}
