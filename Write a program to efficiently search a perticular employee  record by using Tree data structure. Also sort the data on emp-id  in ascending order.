@@ -1,0 +1,96 @@
+   Write a program to efficiently search a perticular employee 
+record by using Tree data structure. Also sort the data on emp-id 
+in ascending order.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to hold employee details
+struct Employee {
+    int emp_id;
+    char name[50];
+    int age;
+    char position[50];
+};
+
+// Structure for a node in the Binary Search Tree (BST)
+struct Node {
+    struct Employee emp;  // Employee data
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node with employee details
+struct Node* createNode(int emp_id, char* name, int age, char* position) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->emp.emp_id = emp_id;
+    strcpy(newNode->emp.name, name);
+    newNode->emp.age = age;
+    strcpy(newNode->emp.position, position);
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert an employee into the BST
+struct Node* insert(struct Node* root, int emp_id, char* name, int age, char* position) {
+    if (root == NULL) {
+        return createNode(emp_id, name, age, position);
+    }
+
+    if (emp_id < root->emp.emp_id) {
+        root->left = insert(root->left, emp_id, name, age, position);
+    } else if (emp_id > root->emp.emp_id) {
+        root->right = insert(root->right, emp_id, name, age, position);
+    }
+
+    return root;
+}
+
+// Function to search for an employee by emp_id
+struct Node* search(struct Node* root, int emp_id) {
+    if (root == NULL || root->emp.emp_id == emp_id) {
+        return root;
+    }
+
+    if (emp_id < root->emp.emp_id) {
+        return search(root->left, emp_id);
+    } else {
+        return search(root->right, emp_id);
+    }
+}
+
+// Function to perform in-order traversal and display employee records sorted by emp_id
+void inOrder(struct Node* root) {
+    if (root != NULL) {
+        inOrder(root->left);
+        printf("Emp ID: %d\nName: %s\nAge: %d\nPosition: %s\n\n", root->emp.emp_id, root->emp.name, root->emp.age, root->emp.position);
+        inOrder(root->right);
+    }
+}
+
+// Main function
+int main() {
+    struct Node* root = NULL;
+
+    // Sample employee records
+    root = insert(root, 101, "Alice", 30, "Manager");
+    root = insert(root, 102, "Bob", 25, "Developer");
+    root = insert(root, 103, "Charlie", 35, "Designer");
+    root = insert(root, 104, "David", 28, "Tester");
+
+    printf("Employee Records in Ascending Order of Emp ID:\n");
+    inOrder(root);
+
+    // Search for a specific employee by emp_id
+    int search_id = 102;
+    struct Node* result = search(root, search_id);
+
+    if (result != NULL) {
+        printf("Employee Found:\n");
+        printf("Emp ID: %d\nName: %s\nAge: %d\nPosition: %s\n", result->emp.emp_id, result->emp.name, result->emp.age, result->emp.position);
+    } else {
+        printf("Employee with Emp ID %d not found.\n", search_id);
+    }
+
+    return 0;
+}
