@@ -1,0 +1,111 @@
+//WAP to implement Insertion sort and Quick Sort on 1D array of
+Student structure (contains student_name, student_roll_no,
+total_marks), with key as student_roll_no. And count the number
+of swap performed.
+
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char student_name[50];
+    int student_roll_no;
+    float total_marks;
+} Student;
+
+// Function to print the array of Student structures
+void printStudentArray(Student students[], int n) {
+    printf("Student Details:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Name: %s, Roll No: %d, Total Marks: %.2f\n", students[i].student_name, students[i].student_roll_no, students[i].total_marks);
+    }
+}
+
+// Function to swap two Student structures and count swaps
+void swap(Student *a, Student *b, int *swap_count) {
+    Student temp = *a;
+    *a = *b;
+    *b = temp;
+    (*swap_count)++;
+}
+
+// Insertion Sort Implementation
+void insertionSort(Student arr[], int n, int *swap_count) {
+    for (int i = 1; i < n; i++) {
+        Student key = arr[i];
+        int j = i - 1;
+
+        // Move elements of arr[0..i-1] that are greater than key
+        // to one position ahead of their current position
+        while (j >= 0 && arr[j].student_roll_no > key.student_roll_no) {
+            arr[j + 1] = arr[j];
+            (*swap_count)++;
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+// Quick Sort Functions
+int partition(Student arr[], int low, int high, int *swap_count) {
+    int pivot = arr[high].student_roll_no; // pivot
+    int i = low - 1;                       // Index of smaller element
+
+    for (int j = low; j < high; j++) {
+        if (arr[j].student_roll_no < pivot) {
+            i++;
+            swap(&arr[i], &arr[j], swap_count);
+        }
+    }
+    swap(&arr[i + 1], &arr[high], swap_count);
+    return i + 1;
+}
+
+void quickSort(Student arr[], int low, int high, int *swap_count) {
+    if (low < high) {
+        int pi = partition(arr, low, high, swap_count);
+
+        quickSort(arr, low, pi - 1, swap_count);
+        quickSort(arr, pi + 1, high, swap_count);
+    }
+}
+
+// Main Function
+int main() {
+    int n;
+
+    printf("Enter the number of students: ");
+    scanf("%d", &n);
+
+    Student students[n];
+
+    // Input Student Details
+    for (int i = 0; i < n; i++) {
+        printf("Enter details for student %d:\n", i + 1);
+        printf("Name: ");
+        scanf("%s", students[i].student_name);
+        printf("Roll No: ");
+        scanf("%d", &students[i].student_roll_no);
+        printf("Total Marks: ");
+        scanf("%f", &students[i].total_marks);
+    }
+
+    // Insertion Sort
+    Student insertionSortedStudents[n];
+    memcpy(insertionSortedStudents, students, sizeof(students));
+    int insertionSwapCount = 0;
+    insertionSort(insertionSortedStudents, n, &insertionSwapCount);
+    printf("\nStudents sorted by Insertion Sort (by student_roll_no):\n");
+    printStudentArray(insertionSortedStudents, n);
+    printf("Number of swaps in Insertion Sort: %d\n", insertionSwapCount);
+
+    // Quick Sort
+    Student quickSortedStudents[n];
+    memcpy(quickSortedStudents, students, sizeof(students));
+    int quickSwapCount = 0;
+    quickSort(quickSortedStudents, 0, n - 1, &quickSwapCount);
+    printf("\nStudents sorted by Quick Sort (by student_roll_no):\n");
+    printStudentArray(quickSortedStudents, n);
+    printf("Number of swaps in Quick Sort: %d\n", quickSwapCount);
+
+    return 0;
+}
