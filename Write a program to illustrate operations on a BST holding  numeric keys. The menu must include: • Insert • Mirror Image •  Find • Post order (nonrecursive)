@@ -1,0 +1,166 @@
+Write a program to illustrate operations on a BST holding 
+numeric keys. The menu must include: • Insert • Mirror Image • 
+Find • Post order (nonrecursive)
+#include <stdio.h>
+#include <stdlib.h>
+#include <stack>
+
+// Definition of a BST Node
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node in the BST
+struct Node* insert(struct Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else if (data > root->data) {
+        root->right = insert(root->right, data);
+    }
+
+    return root;
+}
+
+// Function to find a node in the BST
+int find(struct Node* root, int data) {
+    if (root == NULL) {
+        return 0; // Node not found
+    }
+
+    if (data == root->data) {
+        return 1; // Node found
+    } else if (data < root->data) {
+        return find(root->left, data);
+    } else {
+        return find(root->right, data);
+    }
+}
+
+// Function to create a mirror image of the BST
+void mirror(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    // Swap the left and right children of the node
+    struct Node* temp = root->left;
+    root->left = root->right;
+    root->right = temp;
+
+    // Recursively mirror the left and right subtrees
+    mirror(root->left);
+    mirror(root->right);
+}
+
+// Function to do a nonrecursive postorder traversal of the BST
+void postOrderNonRecursive(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    // Two stacks are used to simulate the postorder traversal
+    std::stack<struct Node*> stack1, stack2;
+    stack1.push(root);
+
+    // Traverse the tree in a manner similar to postorder
+    while (!stack1.empty()) {
+        struct Node* node = stack1.top();
+        stack1.pop();
+        stack2.push(node);
+
+        // Push left and right children to the stack
+        if (node->left != NULL) {
+            stack1.push(node->left);
+        }
+        if (node->right != NULL) {
+            stack1.push(node->right);
+        }
+    }
+
+    // Print the nodes in postorder (stack2 will contain the postorder sequence)
+    while (!stack2.empty()) {
+        struct Node* node = stack2.top();
+        stack2.pop();
+        printf("%d ", node->data);
+    }
+}
+
+// Function to do an inorder traversal and display the BST
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+
+// Main function
+int main() {
+    struct Node* root = NULL;
+    int choice, data;
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Insert\n");
+        printf("2. Mirror Image\n");
+        printf("3. Find\n");
+        printf("4. Post-order Traversal (Non-recursive)\n");
+        printf("5. Show (Inorder Traversal)\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the number to insert: ");
+                scanf("%d", &data);
+                root = insert(root, data);
+                printf("%d inserted.\n", data);
+                break;
+            case 2:
+                mirror(root);
+                printf("Mirror image of the tree created.\n");
+                break;
+            case 3:
+                printf("Enter the number to find: ");
+                scanf("%d", &data);
+                if (find(root, data)) {
+                    printf("%d found in the tree.\n", data);
+                } else {
+                    printf("%d not found in the tree.\n", data);
+                }
+                break;
+            case 4:
+                printf("Post-order Traversal (Non-recursive): ");
+                postOrderNonRecursive(root);
+                printf("\n");
+                break;
+            case 5:
+                printf("Inorder Traversal of BST: ");
+                inorder(root);
+                printf("\n");
+                break;
+            case 6:
+                printf("Exiting program...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
