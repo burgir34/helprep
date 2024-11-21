@@ -1,0 +1,157 @@
+//Implement following collision handling techniques on hash table
+where Mod hash function is used.
+A. Linear Probing
+B. Quadratic Probing.
+C. Double Hashing.
+Also mentioned number of collision occurred in each technique.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10  // Size of hash table
+
+// Struct to represent a hash table
+typedef struct {
+    int *table;
+    int *collisions;
+} HashTable;
+
+// Function to create and initialize the hash table
+HashTable* createHashTable() {
+    HashTable ht = (HashTable)malloc(sizeof(HashTable));
+    ht->table = (int*)malloc(sizeof(int) * TABLE_SIZE);
+    ht->collisions = (int*)malloc(sizeof(int) * TABLE_SIZE);
+    
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        ht->table[i] = -1;  // -1 indicates an empty slot
+        ht->collisions[i] = 0; // Initialize collision count to 0
+    }
+    
+    return ht;
+}
+
+// Mod Hash Function
+int hash(int key) {
+    return key % TABLE_SIZE;
+}
+
+// Linear Probing Insertion
+void linearProbing(HashTable *ht, int key) {
+    int index = hash(key);
+    int collisions = 0;
+    
+    while (ht->table[index] != -1) {
+        collisions++;
+        index = (index + 1) % TABLE_SIZE;  // Linear probe
+    }
+    
+    ht->table[index] = key;
+    ht->collisions[collisions]++;
+}
+
+// Quadratic Probing Insertion
+void quadraticProbing(HashTable *ht, int key) {
+    int index = hash(key);
+    int collisions = 0;
+    
+    while (ht->table[index] != -1) {
+        collisions++;
+        index = (index + collisions * collisions) % TABLE_SIZE;  // Quadratic probe
+    }
+    
+    ht->table[index] = key;
+    ht->collisions[collisions]++;
+}
+
+// Second Hash Function for Double Hashing
+int secondHash(int key) {
+    return 7 - (key % 7);  // Second hash function (a prime number less than TABLE_SIZE)
+}
+
+// Double Hashing Insertion
+void doubleHashing(HashTable *ht, int key) {
+    int index = hash(key);
+    int stepSize = secondHash(key);
+    int collisions = 0;
+    
+    while (ht->table[index] != -1) {
+        collisions++;
+        index = (index + collisions * stepSize) % TABLE_SIZE;  // Double hashing
+    }
+    
+    ht->table[index] = key;
+    ht->collisions[collisions]++;
+}
+
+// Function to print hash table
+void printHashTable(HashTable *ht) {
+    printf("Hash Table:\n");
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if (ht->table[i] == -1)
+            printf("[%d] -> Empty\n", i);
+        else
+            printf("[%d] -> %d\n", i, ht->table[i]);
+    }
+}
+
+// Function to print number of collisions for each method
+void printCollisions(HashTable *ht) {
+    printf("Collisions Count:\n");
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if (ht->collisions[i] > 0)
+            printf("Number of collisions with %d probes: %d\n", i, ht->collisions[i]);
+    }
+}
+
+int main() {
+    HashTable *ht1 = createHashTable();
+    HashTable *ht2 = createHashTable();
+    HashTable *ht3 = createHashTable();
+    
+    // Inserting values into hash tables using different methods
+    linearProbing(ht1, 12);
+    linearProbing(ht1, 22);
+    linearProbing(ht1, 32);
+    linearProbing(ht1, 42);
+    linearProbing(ht1, 52);
+    
+    quadraticProbing(ht2, 12);
+    quadraticProbing(ht2, 22);
+    quadraticProbing(ht2, 32);
+    quadraticProbing(ht2, 42);
+    quadraticProbing(ht2, 52);
+    
+    doubleHashing(ht3, 12);
+    doubleHashing(ht3, 22);
+    doubleHashing(ht3, 32);
+    doubleHashing(ht3, 42);
+    doubleHashing(ht3, 52);
+    
+    // Printing hash tables and collision counts
+    printf("\n--- Linear Probing ---\n");
+    printHashTable(ht1);
+    printCollisions(ht1);
+    
+    printf("\n--- Quadratic Probing ---\n");
+    printHashTable(ht2);
+    printCollisions(ht2);
+    
+    printf("\n--- Double Hashing ---\n");
+    printHashTable(ht3);
+    printCollisions(ht3);
+
+    // Free memory
+    free(ht1->table);
+    free(ht1->collisions);
+    free(ht1);
+    
+    free(ht2->table);
+    free(ht2->collisions);
+    free(ht2);
+    
+    free(ht3->table);
+    free(ht3->collisions);
+    free(ht3);
+
+    return 0;
+}
