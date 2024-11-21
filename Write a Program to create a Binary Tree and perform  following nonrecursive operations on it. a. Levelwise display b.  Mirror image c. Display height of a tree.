@@ -1,0 +1,104 @@
+ Write a Program to create a Binary Tree and perform 
+following nonrecursive operations on it. a. Levelwise display b. 
+Mirror image c. Display height of a tree.
+#include <stdio.h>
+#include <stdlib.h>
+#include <queue>
+
+// Define the structure for a binary tree node
+struct TreeNode {
+    int data;
+    struct TreeNode* left;
+    struct TreeNode* right;
+};
+
+// Function to create a new binary tree node
+struct TreeNode* createTreeNode(int data) {
+    struct TreeNode* newNode = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// Function to perform level order traversal (Level-wise display)
+void levelOrderTraversal(struct TreeNode* root) {
+    if (root == NULL) return;
+
+    std::queue<struct TreeNode*> queue;
+    queue.push(root);
+
+    while (!queue.empty()) {
+        struct TreeNode* node = queue.front();
+        queue.pop();
+        printf("%d ", node->data);
+
+        if (node->left) queue.push(node->left);
+        if (node->right) queue.push(node->right);
+    }
+    printf("\n");
+}
+
+// Function to perform mirror image of the tree
+void mirrorTree(struct TreeNode* root) {
+    if (root == NULL) return;
+
+    // Swap the left and right child nodes
+    struct TreeNode* temp = root->left;
+    root->left = root->right;
+    root->right = temp;
+
+    // Recursively call mirror on left and right subtrees
+    mirrorTree(root->left);
+    mirrorTree(root->right);
+}
+
+// Function to display the height of the tree
+int heightOfTree(struct TreeNode* root) {
+    if (root == NULL) return 0;
+
+    std::queue<std::pair<struct TreeNode*, int>> queue;
+    queue.push({root, 1});
+    int maxHeight = 0;
+
+    while (!queue.empty()) {
+        struct TreeNode* node = queue.front().first;
+        int height = queue.front().second;
+        queue.pop();
+
+        maxHeight = (height > maxHeight) ? height : maxHeight;
+
+        if (node->left) queue.push({node->left, height + 1});
+        if (node->right) queue.push({node->right, height + 1});
+    }
+
+    return maxHeight;
+}
+
+// Main function to test the operations
+int main() {
+    // Create the binary tree
+    struct TreeNode* root = createTreeNode(1);
+    root->left = createTreeNode(2);
+    root->right = createTreeNode(3);
+    root->left->left = createTreeNode(4);
+    root->left->right = createTreeNode(5);
+    root->right->left = createTreeNode(6);
+    root->right->right = createTreeNode(7);
+
+    // Level-wise display (Level order traversal)
+    printf("Level order traversal: ");
+    levelOrderTraversal(root);
+
+    // Mirror image of the tree
+    mirrorTree(root);
+
+    // Level-wise display after mirror image
+    printf("Level order traversal after mirror image: ");
+    levelOrderTraversal(root);
+
+    // Height of the tree
+    printf("Height of the tree: %d\n", heightOfTree(root));
+
+    return 0;
+}
