@@ -1,0 +1,130 @@
+ WAP to store at most 10 digit integer in a Doubly linked list 
+and perform arithmetic operations on it.
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;           // Store a single digit
+    struct Node* prev;  // Pointer to previous node
+    struct Node* next;  // Pointer to next node
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a digit at the end
+void insertAtEnd(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+    struct Node* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+// Function to display the number stored in the doubly linked list
+void displayNumber(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Function to convert doubly linked list to integer
+long long convertToInt(struct Node* head) {
+    long long result = 0;
+    struct Node* temp = head;
+    while (temp != NULL) {
+        result = result * 10 + temp->data;
+        temp = temp->next;
+    }
+    return result;
+}
+
+// Function to add two numbers stored in doubly linked lists
+void addNumbers(struct Node* head1, struct Node* head2) {
+    long long num1 = convertToInt(head1);
+    long long num2 = convertToInt(head2);
+    long long sum = num1 + num2;
+    printf("Sum: %lld\n", sum);
+}
+
+// Function to subtract two numbers stored in doubly linked lists
+void subtractNumbers(struct Node* head1, struct Node* head2) {
+    long long num1 = convertToInt(head1);
+    long long num2 = convertToInt(head2);
+    long long difference = num1 - num2;
+    printf("Difference: %lld\n", difference);
+}
+
+// Function to multiply two numbers stored in doubly linked lists
+void multiplyNumbers(struct Node* head1, struct Node* head2) {
+    long long num1 = convertToInt(head1);
+    long long num2 = convertToInt(head2);
+    long long product = num1 * num2;
+    printf("Product: %lld\n", product);
+}
+
+// Function to divide two numbers stored in doubly linked lists
+void divideNumbers(struct Node* head1, struct Node* head2) {
+    long long num1 = convertToInt(head1);
+    long long num2 = convertToInt(head2);
+    if (num2 == 0) {
+        printf("Error: Division by zero\n");
+    } else {
+        long long quotient = num1 / num2;
+        printf("Quotient: %lld\n", quotient);
+    }
+}
+
+// Main function to test the arithmetic operations
+int main() {
+    struct Node* num1 = NULL;
+    struct Node* num2 = NULL;
+
+    // Inserting digits of the first number into num1
+    insertAtEnd(&num1, 1);
+    insertAtEnd(&num1, 2);
+    insertAtEnd(&num1, 3);
+    insertAtEnd(&num1, 4);
+    insertAtEnd(&num1, 5);
+    insertAtEnd(&num1, 6);
+    insertAtEnd(&num1, 7);
+    insertAtEnd(&num1, 8);
+    insertAtEnd(&num1, 9);
+    insertAtEnd(&num1, 0);
+
+    // Inserting digits of the second number into num2
+    insertAtEnd(&num2, 9);
+    insertAtEnd(&num2, 9);
+    insertAtEnd(&num2, 9);
+    insertAtEnd(&num2, 9);
+    insertAtEnd(&num2, 9);
+    
+    printf("First Number: ");
+    displayNumber(num1);
+    
+    printf("Second Number: ");
+    displayNumber(num2);
+
+    // Performing arithmetic operations
+    addNumbers(num1, num2);
+    subtractNumbers(num1, num2);
+    multiplyNumbers(num1, num2);
+    divideNumbers(num1, num2);
+
+    return 0;
+}
