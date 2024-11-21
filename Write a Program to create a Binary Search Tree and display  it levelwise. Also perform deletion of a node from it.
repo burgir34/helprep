@@ -1,0 +1,154 @@
+ Write a Program to create a Binary Search Tree and display 
+it levelwise. Also perform deletion of a node from it.\
+#include <stdio.h>
+#include <stdlib.h>
+#include <queue>
+
+// Definition of the Binary Tree Node
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node in the Binary Search Tree
+struct Node* insert(struct Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else if (data > root->data) {
+        root->right = insert(root->right, data);
+    }
+
+    return root;
+}
+
+// Function to find the minimum value node in the tree
+struct Node* findMin(struct Node* root) {
+    while (root != NULL && root->left != NULL) {
+        root = root->left;
+    }
+    return root;
+}
+
+// Function to delete a node from the Binary Search Tree
+struct Node* deleteNode(struct Node* root, int data) {
+    if (root == NULL) {
+        return root;
+    }
+
+    if (data < root->data) {
+        root->left = deleteNode(root->left, data);
+    } else if (data > root->data) {
+        root->right = deleteNode(root->right, data);
+    } else {
+        // Node with only one child or no child
+        if (root->left == NULL) {
+            struct Node* temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        // Node with two children: Get the inorder successor
+        struct Node* temp = findMin(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
+    }
+
+    return root;
+}
+
+// Function to perform level-wise traversal (BFS)
+void levelOrderTraversal(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    struct Node* queue[100];
+    int front = 0, rear = 0;
+
+    // Enqueue root node
+    queue[rear++] = root;
+
+    while (front < rear) {
+        struct Node* node = queue[front++];
+
+        // Print the node's data
+        printf("%d ", node->data);
+
+        // Enqueue left and right children
+        if (node->left != NULL) {
+            queue[rear++] = node->left;
+        }
+        if (node->right != NULL) {
+            queue[rear++] = node->right;
+        }
+    }
+}
+
+// Main function
+int main() {
+    struct Node* root = NULL;
+    int choice, data;
+
+    // Creating a Binary Search Tree
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 70);
+    root = insert(root, 60);
+    root = insert(root, 80);
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Insert Node\n");
+        printf("2. Delete Node\n");
+        printf("3. Display Tree (Level-wise Traversal)\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data to insert: ");
+                scanf("%d", &data);
+                root = insert(root, data);
+                printf("Node inserted.\n");
+                break;
+            case 2:
+                printf("Enter data to delete: ");
+                scanf("%d", &data);
+                root = deleteNode(root, data);
+                printf("Node deleted.\n");
+                break;
+            case 3:
+                printf("Level-wise Traversal of the Tree: ");
+                levelOrderTraversal(root);
+                printf("\n");
+                break;
+            case 4:
+                printf("Exiting program...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
