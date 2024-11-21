@@ -1,0 +1,153 @@
+//We Fly Anywhere Airlines (WFAA) is considering redesigning 
+their ticket counters for airline passengers. They would like to 
+have two separate waiting lines, one for regular customers and 
+one for frequent flyers. Assuming there is only one ticket agent 
+available to serve all passengers, they would like to determine 
+the average waiting time for both types of passengers using 
+various strategies for taking passengers from the waiting lines. 
+WAP to simulate this situation.
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+// Structure to represent a queue
+typedef struct {
+    int queue[MAX];
+    int front, rear;
+} Queue;
+
+// Initialize a queue
+void initializeQueue(Queue *q) {
+    q->front = q->rear = -1;
+}
+
+// Check if the queue is empty
+int isEmpty(Queue *q) {
+    return q->front == -1;
+}
+
+// Check if the queue is full
+int isFull(Queue *q) {
+    return q->rear == MAX - 1;
+}
+
+// Enqueue an element
+void enqueue(Queue *q, int value) {
+    if (isFull(q)) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    if (isEmpty(q)) {
+        q->front = 0;
+    }
+    q->queue[++q->rear] = value;
+}
+
+// Dequeue an element
+int dequeue(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    int value = q->queue[q->front];
+    if (q->front == q->rear) {
+        q->front = q->rear = -1; // Reset the queue when empty
+    } else {
+        q->front++;
+    }
+    return value;
+}
+
+// Simulate the process
+void simulate(Queue *regular, Queue *frequent, int strategy) {
+    int time = 0;
+    int totalWaitRegular = 0, totalWaitFrequent = 0;
+    int servedRegular = 0, servedFrequent = 0;
+
+    printf("\nSimulating...\n");
+
+    while (!isEmpty(regular) || !isEmpty(frequent)) {
+        int currentPassenger;
+        switch (strategy) {
+            case 1: // Alternate serving
+                if (!isEmpty(frequent)) {
+                    currentPassenger = dequeue(frequent);
+                    totalWaitFrequent += time - currentPassenger;
+                    servedFrequent++;
+                } else if (!isEmpty(regular)) {
+                    currentPassenger = dequeue(regular);
+                    totalWaitRegular += time - currentPassenger;
+                    servedRegular++;
+                }
+                break;
+            case 2: // Priority to frequent flyers
+                if (!isEmpty(frequent)) {
+                    currentPassenger = dequeue(frequent);
+                    totalWaitFrequent += time - currentPassenger;
+                    servedFrequent++;
+                } else if (!isEmpty(regular)) {
+                    currentPassenger = dequeue(regular);
+                    totalWaitRegular += time - currentPassenger;
+                    servedRegular++;
+                }
+                break;
+            case 3: // Priority to regular customers
+                if (!isEmpty(regular)) {
+                    currentPassenger = dequeue(regular);
+                    totalWaitRegular += time - currentPassenger;
+                    servedRegular++;
+                } else if (!isEmpty(frequent)) {
+                    currentPassenger = dequeue(frequent);
+                    totalWaitFrequent += time - currentPassenger;
+                    servedFrequent++;
+                }
+                break;
+        }
+        time++;
+    }
+
+    // Calculate and display average wait times
+    double avgWaitRegular = servedRegular ? (double)totalWaitRegular / servedRegular : 0;
+    double avgWaitFrequent = servedFrequent ? (double)totalWaitFrequent / servedFrequent : 0;
+
+    printf("Average Waiting Time for Regular Customers: %.2f\n", avgWaitRegular);
+    printf("Average Waiting Time for Frequent Flyers: %.2f\n", avgWaitFrequent);
+}
+
+int main() {
+    Queue regular, frequent;
+    initializeQueue(&regular);
+    initializeQueue(&frequent);
+
+    int n, m, strategy;
+
+    printf("Enter the number of regular customers: ");
+    scanf("%d", &n);
+    printf("Enter the arrival times of regular customers:\n");
+    for (int i = 0; i < n; i++) {
+        int arrivalTime;
+        scanf("%d", &arrivalTime);
+        enqueue(&regular, arrivalTime);
+    }
+
+    printf("Enter the number of frequent flyers: ");
+    scanf("%d", &m);
+    printf("Enter the arrival times of frequent flyers:\n");
+    for (int i = 0; i < m; i++) {
+        int arrivalTime;
+        scanf("%d", &arrivalTime);
+        enqueue(&frequent, arrivalTime);
+    }
+
+    printf("\nChoose a strategy:\n");
+    printf("1. Alternate serving\n");
+    printf("2. Priority to frequent flyers\n");
+    printf("3. Priority to regular customers\n");
+    printf("Enter your choice: ");
+    scanf("%d", &strategy);
+
+    simulate(&regular, &frequent, strategy);
+
+    return 0;
+}
