@@ -1,0 +1,175 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_DIGITS 10  // Maximum number of digits in the number
+
+// Structure to represent each digit of the number in a singly linked list
+struct Node {
+    int digit;  // Stores a single digit
+    struct Node* next;  // Pointer to the next digit
+};
+
+// Function to create a new node with a given digit
+struct Node* createNode(int digit) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->digit = digit;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a digit at the front of the linked list
+void insertDigitAtFront(struct Node** head, int digit) {
+    struct Node* newNode = createNode(digit);
+    newNode->next = *head;
+    *head = newNode;
+}
+
+// Function to display the linked list as a number
+void displayNumber(struct Node* head) {
+    if (head == NULL) {
+        printf("Empty list\n");
+        return;
+    }
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d", temp->digit);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Function to add two large numbers stored in linked lists
+struct Node* addLargeNumbers(struct Node* num1, struct Node* num2) {
+    struct Node* result = NULL;
+    struct Node* temp1 = num1;
+    struct Node* temp2 = num2;
+    int carry = 0;
+
+    while (temp1 != NULL || temp2 != NULL || carry) {
+        int sum = carry;
+
+        if (temp1 != NULL) {
+            sum += temp1->digit;
+            temp1 = temp1->next;
+        }
+
+        if (temp2 != NULL) {
+            sum += temp2->digit;
+            temp2 = temp2->next;
+        }
+
+        carry = sum / 10;
+        insertDigitAtFront(&result, sum % 10);
+    }
+
+    return result;
+}
+
+// Function to subtract two large numbers stored in linked lists
+struct Node* subtractLargeNumbers(struct Node* num1, struct Node* num2) {
+    struct Node* result = NULL;
+    struct Node* temp1 = num1;
+    struct Node* temp2 = num2;
+    int borrow = 0;
+
+    while (temp1 != NULL) {
+        int diff = temp1->digit - borrow;
+
+        if (temp2 != NULL) {
+            diff -= temp2->digit;
+            temp2 = temp2->next;
+        }
+
+        if (diff < 0) {
+            diff += 10;
+            borrow = 1;
+        } else {
+            borrow = 0;
+        }
+
+        insertDigitAtFront(&result, diff);
+        temp1 = temp1->next;
+    }
+
+    return result;
+}
+
+// Function to multiply two large numbers stored in linked lists
+struct Node* multiplyLargeNumbers(struct Node* num1, struct Node* num2) {
+    struct Node* result = NULL;
+    struct Node* temp1 = num1;
+    struct Node* temp2 = num2;
+    int position = 0;
+
+    while (temp1 != NULL) {
+        int carry = 0;
+        struct Node* tempResult = NULL;
+        temp2 = num2;
+
+        while (temp2 != NULL) {
+            int product = (temp1->digit * temp2->digit) + carry;
+            carry = product / 10;
+            insertDigitAtFront(&tempResult, product % 10);
+            temp2 = temp2->next;
+        }
+
+        if (carry) {
+            insertDigitAtFront(&tempResult, carry);
+        }
+
+        // Add the tempResult to the final result, considering the position (shift)
+        struct Node* tempResultShifted = tempResult;
+        for (int i = 0; i < position; i++) {
+            insertDigitAtFront(&tempResultShifted, 0);  // Shift the result to the left
+        }
+
+        result = addLargeNumbers(result, tempResultShifted);  // Add intermediate result
+        position++;
+        temp1 = temp1->next;
+    }
+
+    return result;
+}
+
+// Main function to demonstrate the operations
+int main() {
+    struct Node* num1 = NULL;
+    struct Node* num2 = NULL;
+
+    // Insert digits for first number (example: 12345)
+    insertDigitAtFront(&num1, 1);
+    insertDigitAtFront(&num1, 2);
+    insertDigitAtFront(&num1, 3);
+    insertDigitAtFront(&num1, 4);
+    insertDigitAtFront(&num1, 5);
+
+    // Insert digits for second number (example: 54321)
+    insertDigitAtFront(&num2, 5);
+    insertDigitAtFront(&num2, 4);
+    insertDigitAtFront(&num2, 3);
+    insertDigitAtFront(&num2, 2);
+    insertDigitAtFront(&num2, 1);
+
+    // Display both numbers
+    printf("Number 1: ");
+    displayNumber(num1);
+    printf("Number 2: ");
+    displayNumber(num2);
+
+    // Perform addition
+    struct Node* sum = addLargeNumbers(num1, num2);
+    printf("Sum: ");
+    displayNumber(sum);
+
+    // Perform subtraction (num1 - num2)
+    struct Node* diff = subtractLargeNumbers(num1, num2);
+    printf("Difference: ");
+    displayNumber(diff);
+
+    // Perform multiplication
+    struct Node* product = multiplyLargeNumbers(num1, num2);
+    printf("Product: ");
+    displayNumber(product);
+
+    return 0;
+}
