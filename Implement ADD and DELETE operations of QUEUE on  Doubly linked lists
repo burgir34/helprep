@@ -1,0 +1,117 @@
+ Implement ADD and DELETE operations of QUEUE on 
+Doubly linked lists
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definition of a doubly linked list node
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+// Queue structure to maintain both front and rear of the queue
+struct Queue {
+    struct Node* front;
+    struct Node* rear;
+};
+
+// Function to create a new node with the given data
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to initialize the queue
+void initializeQueue(struct Queue* queue) {
+    queue->front = NULL;
+    queue->rear = NULL;
+}
+
+// Function to check if the queue is empty
+int isEmpty(struct Queue* queue) {
+    return (queue->front == NULL);
+}
+
+// Add operation (enqueue): Adds an element at the rear of the queue
+void enqueue(struct Queue* queue, int data) {
+    struct Node* newNode = createNode(data);
+    if (queue->rear == NULL) {
+        queue->front = queue->rear = newNode;
+    } else {
+        queue->rear->next = newNode;
+        newNode->prev = queue->rear;
+        queue->rear = newNode;
+    }
+    printf("Enqueued %d\n", data);
+}
+
+// Delete operation (dequeue): Removes an element from the front of the queue
+int dequeue(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        printf("Queue is empty, cannot dequeue\n");
+        return -1; // Return a value indicating the queue is empty
+    }
+
+    struct Node* temp = queue->front;
+    int dequeuedValue = temp->data;
+    queue->front = queue->front->next;
+
+    if (queue->front != NULL) {
+        queue->front->prev = NULL;
+    } else {
+        queue->rear = NULL; // If the queue becomes empty, set rear to NULL
+    }
+
+    free(temp); // Free the memory of the dequeued node
+    printf("Dequeued %d\n", dequeuedValue);
+    return dequeuedValue;
+}
+
+// Function to display the queue from front to rear
+void displayQueue(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        printf("Queue is empty\n");
+        return;
+    }
+
+    struct Node* temp = queue->front;
+    printf("Queue elements: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Main function to test queue operations
+int main() {
+    struct Queue queue;
+    initializeQueue(&queue);
+
+    // Testing enqueue operation
+    enqueue(&queue, 10);
+    enqueue(&queue, 20);
+    enqueue(&queue, 30);
+    enqueue(&queue, 40);
+
+    // Display queue after enqueues
+    displayQueue(&queue);
+
+    // Testing dequeue operation
+    dequeue(&queue);
+    dequeue(&queue);
+
+    // Display queue after dequeues
+    displayQueue(&queue);
+
+    // Testing dequeue from an empty queue
+    dequeue(&queue);
+    dequeue(&queue);
+    dequeue(&queue);  // Should show error message for empty queue
+
+    return 0;
+}
