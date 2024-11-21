@@ -1,0 +1,82 @@
+//Write a Program to implement Prim’s algorithm to find
+minimum spanning tree of a user defined graph. Use Adjacency
+Matrix to represent a graph.
+
+#include <stdio.h>
+#include <limits.h>
+
+// Number of vertices in the graph
+#define V 5
+
+// Function to find the vertex with the minimum key value
+int minKey(int key[], int mstSet[]) {
+    int min = INT_MAX, min_index;
+
+    for (int v = 0; v < V; v++) {
+        if (mstSet[v] == 0 && key[v] < min) {
+            min = key[v];
+            min_index = v;
+        }
+    }
+    return min_index;
+}
+
+// Function to implement Prim's algorithm
+void primMST(int graph[V][V]) {
+    int parent[V];  // Array to store constructed MST
+    int key[V];     // Key values to pick minimum weight edge
+    int mstSet[V];  // To represent set of vertices included in MST
+
+    // Initialize all keys as INFINITE
+    for (int i = 0; i < V; i++) {
+        key[i] = INT_MAX;
+        mstSet[i] = 0;
+    }
+
+    // Include the first vertex in the MST
+    key[0] = 0;
+    parent[0] = -1;  // First node is always the root of MST
+
+    // The MST will have V vertices
+    for (int count = 0; count < V - 1; count++) {
+        // Pick the minimum key vertex from the set of vertices not yet processed
+        int u = minKey(key, mstSet);
+        
+        // Add the picked vertex to the MST set
+        mstSet[u] = 1;
+
+        // Update the key and parent values of the adjacent vertices of the picked vertex
+        for (int v = 0; v < V; v++) {
+            // graph[u][v] is non-zero only for adjacent vertices of u
+            // mstSet[v] is false for vertices not yet included in MST
+            // Update key[v] if graph[u][v] is smaller than key[v]
+            if (graph[u][v] != 0 && mstSet[v] == 0 && graph[u][v] < key[v]) {
+                key[v] = graph[u][v];
+                parent[v] = u;
+            }
+        }
+    }
+
+    // Print the constructed MST
+    printf("Edge \tWeight\n");
+    for (int i = 1; i < V; i++) {
+        printf("%d - %d \t%d\n", parent[i], i, graph[i][parent[i]]);
+    }
+}
+
+int main() {
+    int graph[V][V];
+
+    // Input the graph as an adjacency matrix
+    printf("Enter the adjacency matrix (0 means no edge):\n");
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    // Call Prim's algorithm to find the MST
+    primMST(graph);
+
+    return 0;
+}
