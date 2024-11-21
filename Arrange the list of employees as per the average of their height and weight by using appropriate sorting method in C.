@@ -1,0 +1,71 @@
+//Arrange the list of employees as per the average of their height and weight by using appropriate sorting method in C.
+
+#include <stdio.h>
+
+// Structure to store employee details
+typedef struct {
+    char name[50];
+    float height; // in cm
+    float weight; // in kg
+} Employee;
+
+// Function to calculate the average of height and weight
+float calculateAverage(float height, float weight) {
+    return (height + weight) / 2.0;
+}
+
+// Function to sort employees by the average of height and weight
+void sortEmployees(Employee employees[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            float avg1 = calculateAverage(employees[j].height, employees[j].weight);
+            float avg2 = calculateAverage(employees[j + 1].height, employees[j + 1].weight);
+            
+            if (avg1 > avg2) {
+                // Swap the employees
+                Employee temp = employees[j];
+                employees[j] = employees[j + 1];
+                employees[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to display employee details
+void displayEmployees(Employee employees[], int n) {
+    printf("Employee Details:\n");
+    for (int i = 0; i < n; i++) {
+        float avg = calculateAverage(employees[i].height, employees[i].weight);
+        printf("Name: %s, Height: %.2f cm, Weight: %.2f kg, Average: %.2f\n",
+               employees[i].name, employees[i].height, employees[i].weight, avg);
+    }
+}
+
+int main() {
+    int n;
+
+    // Input the number of employees
+    printf("Enter the number of employees: ");
+    scanf("%d", &n);
+
+    Employee employees[n];
+
+    // Input employee details
+    for (int i = 0; i < n; i++) {
+        printf("Enter details for employee %d:\n", i + 1);
+        printf("Name: ");
+        scanf("%s", employees[i].name);
+        printf("Height (in cm): ");
+        scanf("%f", &employees[i].height);
+        printf("Weight (in kg): ");
+        scanf("%f", &employees[i].weight);
+    }
+
+    // Sort employees by the average of height and weight
+    sortEmployees(employees, n);
+
+    // Display sorted employee details
+    displayEmployees(employees, n);
+
+    return 0;
+}
