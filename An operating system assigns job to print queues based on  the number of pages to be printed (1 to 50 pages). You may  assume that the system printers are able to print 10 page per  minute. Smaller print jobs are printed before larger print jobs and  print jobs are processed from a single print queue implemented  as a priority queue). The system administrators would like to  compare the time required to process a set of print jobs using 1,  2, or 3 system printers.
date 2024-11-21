@@ -1,0 +1,163 @@
+// An operating system assigns job to print queues based on 
+the number of pages to be printed (1 to 50 pages). You may 
+assume that the system printers are able to print 10 page per 
+minute. Smaller print jobs are printed before larger print jobs and 
+print jobs are processed from a single print queue implemented 
+as a priority queue). The system administrators would like to 
+compare the time required to process a set of print jobs using 1, 
+2, or 3 system printers. Write a program which simulates 
+processing 100 print jobs of varying lengths using either 1, 2, or 
+3 printers. Assume that a print request is made every minute and 
+that the number of pages to print varies from 1 to 50 pages. To be 
+fair, you will need to process the same set of print jobs each time 
+you add a printer.The output from your program should indicate 
+the order in which the jobs were received, the order in which they 
+were printed, and the time required to process the set of print 
+jobs. If more than one printer is being used, indicate which 
+printer each job was printed on.
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define MAX_JOBS 100
+#define MAX_PAGES 50
+#define PRINT_SPEED 10 // Pages per minute
+
+// Structure for a print job
+typedef struct {
+    int id;      // Job ID
+    int pages;   // Number of pages
+    int time;    // Time the job was submitted
+} PrintJob;
+
+// Priority queue implementation
+typedef struct {
+    PrintJob jobs[MAX_JOBS];
+    int size;
+} PriorityQueue;
+
+// Initialize the priority queue
+void initializeQueue(PriorityQueue *pq) {
+    pq->size = 0;
+}
+
+// Add a job to the priority queue
+void enqueue(PriorityQueue *pq, PrintJob job) {
+    if (pq->size >= MAX_JOBS) {
+        printf("Queue Overflow\n");
+        return;
+    }
+
+    pq->jobs[pq->size++] = job;
+
+    // Sort the queue based on the number of pages (ascending order)
+    for (int i = pq->size - 1; i > 0; i--) {
+        if (pq->jobs[i].pages < pq->jobs[i - 1].pages) {
+            PrintJob temp = pq->jobs[i];
+            pq->jobs[i] = pq->jobs[i - 1];
+            pq->jobs[i - 1] = temp;
+        }
+    }
+}
+
+// Remove the highest-priority job from the queue
+PrintJob dequeue(PriorityQueue *pq) {
+    if (pq->size <= 0) {
+        printf("Queue Underflow\n");
+        return (PrintJob){-1, -1, -1};
+    }
+    return pq->jobs[--pq->size];
+}
+
+// Check if the queue is empty
+int isEmpty(PriorityQueue *pq) {
+    return pq->size == 0;
+}
+
+// Simulation function
+void simulate(int numPrinters) {
+    PriorityQueue pq;
+    initializeQueue(&pq);
+
+    PrintJob jobs[MAX_JOBS];
+    int printerTimes[3] = {0}; // Time when each printer will be free
+    int totalTime = 0;
+
+    // Generate 100 print jobs with random page numbers
+    srand(time(0));
+    for (int i = 0; i < MAX_JOBS; i++) {
+        jobs[i].id = i + 1;
+        jobs[i].pages = rand() % MAX_PAGES + 1;
+        jobs[i].time = i; // Job submission time
+        enqueue(&pq, jobs[i]);
+    }
+
+    printf("\nSimulating with %d printer(s)...\n", numPrinters);
+    printf("Order of received jobs:\n");
+    for (int i = 0; i < MAX_JOBS; i++) {
+        printf("Job %d: %d pages\n", jobs[i].id, jobs[i].pages);
+    }
+
+    printf("\nOrder of printed jobs:\n");
+    while (!isEmpty(&pq)) {
+        PrintJob job = dequeue(&pq);
+
+        // Find the next available printer
+        int minPrinter = 0;
+        for (int i = 1; i < numPrinters; i++) {
+            if (printerTimes[i] < printerTimes[minPrinter]) {
+                minPrinter = i;
+            }
+        }
+
+        // Process the job
+        if (printerTimes[minPrinter] < job.time) {
+            printerTimes[minPrinter] = job.time;
+        }
+        printerTimes[minPrinter] += (job.pages + PRINT_SPEED - 1) / PRINT_SPEED;
+
+        printf("Job %d (%d pages) printed on Printer %d at time %d\n",
+               job.id, job.pages, minPrinter + 1, printerTimes[minPrinter]);
+    }
+
+    // Calculate total time taken
+    for (int i = 0; i < numPrinters; i++) {
+        if (printerTimes[i] > totalTime) {
+            totalTime = printerTimes[i];
+        }
+    }
+
+    printf("\nTotal time required: %d minutes\n", totalTime);
+}
+
+int main() {
+    int choice;
+    do {
+        printf("\nSimulation Menu:\n");
+        printf("1. Simulate with 1 printer\n");
+        printf("2. Simulate with 2 printers\n");
+        printf("3. Simulate with 3 printers\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                simulate(1);
+                break;
+            case 2:
+                simulate(2);
+                break;
+            case 3:
+                simulate(3);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
