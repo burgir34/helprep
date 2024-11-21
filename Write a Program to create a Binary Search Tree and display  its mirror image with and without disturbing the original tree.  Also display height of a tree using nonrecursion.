@@ -1,0 +1,199 @@
+  Write a Program to create a Binary Search Tree and display 
+its mirror image with and without disturbing the original tree. 
+Also display height of a tree using nonrecursion.
+#include <stdio.h>
+#include <stdlib.h>
+#include <queue>
+
+// Definition of the Binary Tree Node
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node in the Binary Search Tree
+struct Node* insert(struct Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else if (data > root->data) {
+        root->right = insert(root->right, data);
+    }
+
+    return root;
+}
+
+// Function to find the height of the tree using non-recursive method
+int findHeight(struct Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+
+    struct Node* queue[100];
+    int front = 0, rear = 0;
+    int height = 0;
+
+    // Enqueue the root node
+    queue[rear++] = root;
+
+    while (front < rear) {
+        int nodeCount = rear - front;
+        height++;
+
+        // Process all nodes at the current level
+        while (nodeCount--) {
+            struct Node* node = queue[front++];
+            
+            if (node->left != NULL) {
+                queue[rear++] = node->left;
+            }
+            if (node->right != NULL) {
+                queue[rear++] = node->right;
+            }
+        }
+    }
+
+    return height;
+}
+
+// Function to mirror the tree without disturbing the original tree
+struct Node* mirror(struct Node* root) {
+    if (root == NULL) {
+        return NULL;
+    }
+
+    struct Node* newRoot = createNode(root->data);
+    newRoot->left = mirror(root->right);
+    newRoot->right = mirror(root->left);
+
+    return newRoot;
+}
+
+// Function to mirror the tree and modify the original tree
+void mirrorInPlace(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    // Swap left and right subtrees
+    struct Node* temp = root->left;
+    root->left = root->right;
+    root->right = temp;
+
+    // Recursively mirror the left and right subtrees
+    mirrorInPlace(root->left);
+    mirrorInPlace(root->right);
+}
+
+// Function to perform level-order traversal (BFS)
+void levelOrderTraversal(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    struct Node* queue[100];
+    int front = 0, rear = 0;
+
+    // Enqueue root node
+    queue[rear++] = root;
+
+    while (front < rear) {
+        struct Node* node = queue[front++];
+
+        // Print the node's data
+        printf("%d ", node->data);
+
+        // Enqueue left and right children
+        if (node->left != NULL) {
+            queue[rear++] = node->left;
+        }
+        if (node->right != NULL) {
+            queue[rear++] = node->right;
+        }
+    }
+}
+
+// Function to display the tree's contents (level-order)
+void displayTree(struct Node* root) {
+    printf("Level Order Traversal: ");
+    levelOrderTraversal(root);
+    printf("\n");
+}
+
+// Main function
+int main() {
+    struct Node* root = NULL;
+    struct Node* mirroredRoot = NULL;
+    int choice, data;
+
+    // Creating a Binary Search Tree
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 70);
+    root = insert(root, 60);
+    root = insert(root, 80);
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Insert Node\n");
+        printf("2. Display Tree (Level-wise Traversal)\n");
+        printf("3. Display Mirror Image of the Tree (without modifying original)\n");
+        printf("4. Display Mirror Image of the Tree (modifying original)\n");
+        printf("5. Display Height of the Tree\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data to insert: ");
+                scanf("%d", &data);
+                root = insert(root, data);
+                printf("Node inserted.\n");
+                break;
+
+            case 2:
+                displayTree(root);
+                break;
+
+            case 3:
+                mirroredRoot = mirror(root);
+                printf("Mirror Image of Tree (without modifying original): ");
+                displayTree(mirroredRoot);
+                break;
+
+            case 4:
+                mirrorInPlace(root);
+                printf("Mirror Image of Tree (modifying original): ");
+                displayTree(root);
+                break;
+
+            case 5:
+                printf("Height of the tree: %d\n", findHeight(root));
+                break;
+
+            case 6:
+                printf("Exiting program...\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
