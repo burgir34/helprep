@@ -1,0 +1,55 @@
+//Assume that an array A with n elements was sorted in an ascending order, but two of its elements swapped their positions by
+a mistake while maintaining the array. Write a code to identify the
+swapped pair of elements and their positions in the asymptotically
+best possible time. [Assume that all given elements are distinct
+integers.]
+
+#include <stdio.h>
+
+// Function to find the swapped pair
+void findSwappedPair(int A[], int n) {
+    int first = -1, second = -1;
+
+    // Traverse the array to find the two out-of-order elements
+    for (int i = 0; i < n - 1; i++) {
+        if (A[i] > A[i + 1]) {
+            // First occurrence of disorder
+            if (first == -1) {
+                first = i;
+            } else {
+                // Second occurrence of disorder
+                second = i + 1;
+            }
+        }
+    }
+
+    // Handle case where second is not directly set
+    if (second == -1) {
+        second = first + 1;
+    }
+
+    // Output the swapped pair and their positions
+    printf("Swapped elements are: %d at position %d and %d at position %d\n",
+           A[first], first, A[second], second);
+}
+
+int main() {
+    int n;
+
+    // Input array size
+    printf("Enter the number of elements in the array: ");
+    scanf("%d", &n);
+
+    int A[n];
+
+    // Input array elements
+    printf("Enter the elements of the array (sorted with two swapped):\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &A[i]);
+    }
+
+    // Find and print the swapped pair
+    findSwappedPair(A, n);
+
+    return 0;
+}
