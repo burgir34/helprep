@@ -1,0 +1,132 @@
+ Write a Program to accept a graph from user and represent 
+it with Adjacency List and perform BFS and DFS traversals on it. 
+ #include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 20
+
+// Structure for the adjacency list node
+struct Node {
+    int vertex;
+    struct Node* next;
+};
+
+// Structure for the graph
+struct Graph {
+    int V;
+    struct Node* adjList[MAX_VERTICES];
+};
+
+// Function to create a graph
+struct Graph* createGraph(int vertices) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->V = vertices;
+
+    // Initialize the adjacency list
+    for (int i = 0; i < vertices; i++) {
+        graph->adjList[i] = NULL;
+    }
+
+    return graph;
+}
+
+// Function to add an edge to the graph
+void addEdge(struct Graph* graph, int src, int dest) {
+    // Add edge from src to dest
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = dest;
+    newNode->next = graph->adjList[src];
+    graph->adjList[src] = newNode;
+
+    // Add edge from dest to src (since the graph is undirected)
+    newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = src;
+    newNode->next = graph->adjList[dest];
+    graph->adjList[dest] = newNode;
+}
+
+// BFS traversal
+void BFS(struct Graph* graph, int startVertex) {
+    int visited[MAX_VERTICES] = {0};
+    int queue[MAX_VERTICES], front = -1, rear = -1;
+
+    // Enqueue the starting vertex and mark it as visited
+    queue[++rear] = startVertex;
+    visited[startVertex] = 1;
+
+    printf("BFS Traversal: ");
+    
+    while (front < rear) {
+        int currentVertex = queue[++front];
+        printf("%d ", currentVertex);
+
+        // Traverse the neighbors of the current vertex
+        struct Node* temp = graph->adjList[currentVertex];
+        while (temp) {
+            int adjVertex = temp->vertex;
+
+            if (!visited[adjVertex]) {
+                queue[++rear] = adjVertex;
+                visited[adjVertex] = 1;
+            }
+            temp = temp->next;
+        }
+    }
+    printf("\n");
+}
+
+// DFS traversal
+void DFS(struct Graph* graph, int startVertex, int visited[MAX_VERTICES]) {
+    // Mark the current node as visited and print it
+    visited[startVertex] = 1;
+    printf("%d ", startVertex);
+
+    // Visit all the unvisited neighbors
+    struct Node* temp = graph->adjList[startVertex];
+    while (temp) {
+        int adjVertex = temp->vertex;
+        if (!visited[adjVertex]) {
+            DFS(graph, adjVertex, visited);
+        }
+        temp = temp->next;
+    }
+}
+
+// Function to initiate DFS
+void startDFS(struct Graph* graph, int startVertex) {
+    int visited[MAX_VERTICES] = {0};  // Initialize visited array
+    printf("DFS Traversal: ");
+    DFS(graph, startVertex, visited);
+    printf("\n");
+}
+
+// Main function
+int main() {
+    int vertices, edges, src, dest, startVertex;
+
+    // Input number of vertices and edges
+    printf("Enter number of vertices: ");
+    scanf("%d", &vertices);
+
+    struct Graph* graph = createGraph(vertices);
+
+    printf("Enter number of edges: ");
+    scanf("%d", &edges);
+
+    // Input edges
+    for (int i = 0; i < edges; i++) {
+        printf("Enter edge %d (src dest): ", i + 1);
+        scanf("%d %d", &src, &dest);
+        addEdge(graph, src, dest);
+    }
+
+    // Input start vertex for BFS and DFS
+    printf("Enter the starting vertex for BFS and DFS: ");
+    scanf("%d", &startVertex);
+
+    // Perform BFS and DFS
+    BFS(graph, startVertex);
+    startDFS(graph, startVertex);
+
+    return 0;
+}
