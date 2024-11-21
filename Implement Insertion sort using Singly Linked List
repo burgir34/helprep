@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a node of the singly linked list
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Function to create a new node with the given data
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a node at the end of the list
+void appendNode(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+}
+
+// Function to display the list
+void displayList(struct Node* head) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Function to perform Insertion Sort on a singly linked list
+void insertionSort(struct Node** head) {
+    if (*head == NULL || (*head)->next == NULL) {
+        return; // List is already sorted or empty
+    }
+
+    struct Node* sorted = NULL; // Initially empty sorted list
+    struct Node* current = *head; // Current node to be inserted into sorted list
+
+    while (current != NULL) {
+        struct Node* next = current->next; // Save the next node to process
+
+        // Insert current node into the sorted part of the list
+        if (sorted == NULL || sorted->data >= current->data) {
+            // Insert at the beginning of the sorted list
+            current->next = sorted;
+            sorted = current;
+        } else {
+            struct Node* temp = sorted;
+            // Find the correct position to insert the current node
+            while (temp->next != NULL && temp->next->data < current->data) {
+                temp = temp->next;
+            }
+            current->next = temp->next;
+            temp->next = current;
+        }
+
+        current = next; // Move to the next node to be processed
+    }
+
+    *head = sorted; // Update the head pointer to point to the sorted list
+}
+
+// Main function to test the Insertion Sort on singly linked list
+int main() {
+    struct Node* head = NULL;
+
+    // Inserting values into the linked list
+    appendNode(&head, 5);
+    appendNode(&head, 2);
+    appendNode(&head, 9);
+    appendNode(&head, 1);
+    appendNode(&head, 3);
+    
+    printf("Original List: ");
+    displayList(head);
+
+    // Performing Insertion Sort
+    insertionSort(&head);
+
+    printf("Sorted List: ");
+    displayList(head);
+
+    return 0;
+}
