@@ -1,0 +1,159 @@
+Write a Program to simulate the following situation. 
+Computer is a multitasking device. We need to download some 
+document as well as listen music and play game simultaneously. 
+There is a system queue which decides which task to be done 
+first. Assume that for download application priority is highest 
+and game playing is having lowest priority. After completion of 
+one type of tasks like all download operations then the second 
+queue will be processed.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_TASKS 10
+
+// Task types
+#define DOWNLOAD 1
+#define MUSIC 2
+#define GAME 3
+
+// Structure for a task
+typedef struct {
+    int taskType;
+    char taskName[50];
+    int duration;  // in seconds
+} Task;
+
+// Structure for a queue
+typedef struct {
+    Task tasks[MAX_TASKS];
+    int front, rear;
+} Queue;
+
+// Function to initialize a queue
+void initializeQueue(Queue *q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+// Function to check if the queue is empty
+int isEmpty(Queue *q) {
+    return q->front == -1;
+}
+
+// Function to check if the queue is full
+int isFull(Queue *q) {
+    return q->rear == MAX_TASKS - 1;
+}
+
+// Function to enqueue a task
+void enqueue(Queue *q, Task task) {
+    if (isFull(q)) {
+        printf("Queue is full. Cannot add more tasks.\n");
+        return;
+    }
+    if (isEmpty(q)) {
+        q->front = 0;
+    }
+    q->rear++;
+    q->tasks[q->rear] = task;
+}
+
+// Function to dequeue a task
+Task dequeue(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty. No tasks to dequeue.\n");
+        Task emptyTask = {-1, "", 0};
+        return emptyTask;
+    }
+    Task task = q->tasks[q->front];
+    if (q->front == q->rear) {
+        q->front = q->rear = -1;
+    } else {
+        q->front++;
+    }
+    return task;
+}
+
+// Function to process the tasks of a queue
+void processTasks(Queue *q, const char *taskTypeName) {
+    printf("\nProcessing %s tasks:\n", taskTypeName);
+    while (!isEmpty(q)) {
+        Task task = dequeue(q);
+        printf("Task: %s, Duration: %d seconds\n", task.taskName, task.duration);
+        // Simulate task completion by waiting (here just a print statement)
+        printf("Completed: %s\n", task.taskName);
+    }
+}
+
+// Main function
+int main() {
+    Queue downloadQueue, musicQueue, gameQueue;
+    initializeQueue(&downloadQueue);
+    initializeQueue(&musicQueue);
+    initializeQueue(&gameQueue);
+
+    int choice;
+    Task task;
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Add Download Task\n");
+        printf("2. Add Music Task\n");
+        printf("3. Add Game Task\n");
+        printf("4. Process Download Tasks\n");
+        printf("5. Process Music Tasks\n");
+        printf("6. Process Game Tasks\n");
+        printf("7. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter task name for download: ");
+                getchar(); // to consume the newline character
+                fgets(task.taskName, sizeof(task.taskName), stdin);
+                task.taskName[strcspn(task.taskName, "\n")] = 0; // Remove newline character
+                task.taskType = DOWNLOAD;
+                printf("Enter task duration (seconds): ");
+                scanf("%d", &task.duration);
+                enqueue(&downloadQueue, task);
+                break;
+            case 2:
+                printf("Enter task name for music: ");
+                getchar(); // to consume the newline character
+                fgets(task.taskName, sizeof(task.taskName), stdin);
+                task.taskName[strcspn(task.taskName, "\n")] = 0; // Remove newline character
+                task.taskType = MUSIC;
+                printf("Enter task duration (seconds): ");
+                scanf("%d", &task.duration);
+                enqueue(&musicQueue, task);
+                break;
+            case 3:
+                printf("Enter task name for game: ");
+                getchar(); // to consume the newline character
+                fgets(task.taskName, sizeof(task.taskName), stdin);
+                task.taskName[strcspn(task.taskName, "\n")] = 0; // Remove newline character
+                task.taskType = GAME;
+                printf("Enter task duration (seconds): ");
+                scanf("%d", &task.duration);
+                enqueue(&gameQueue, task);
+                break;
+            case 4:
+                processTasks(&downloadQueue, "Download");
+                break;
+            case 5:
+                processTasks(&musicQueue, "Music");
+                break;
+            case 6:
+                processTasks(&gameQueue, "Game");
+                break;
+            case 7:
+                printf("Exiting...\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
